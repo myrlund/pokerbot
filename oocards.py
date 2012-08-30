@@ -21,6 +21,11 @@ class Hand:
     self.hole_cards = hole_cards
     self.cards = Hand.calculate_max_hand(hole_cards + cards_on_table)
   
+  def __cmp__(self, other):
+      for i in range(0, self.strength()):
+          return self.strength()[i] - other.strength()[i]
+      
+  
   @classmethod
   def calculate_max_hand(cards):
     if len(cards) > 5:
