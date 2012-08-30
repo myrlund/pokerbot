@@ -1,5 +1,5 @@
 class Player:
-    #maybe we should distinguish between "intelligent" player and bots?
+    #maybe we should distinguish between "intelligent" player and "unintelligent" bots?
     
     #does a player need to have the distinctino betweeen the cards on the table and the hole cards?
     #a Hand is the best hand, no distinction?
