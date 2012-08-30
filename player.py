@@ -14,6 +14,6 @@ class Player:
     def __str__(self):
         return "[Player: "+ self.playerid +" Pot: $"+ str(self.playerpot) +" Cards: "+ str(self.hand) +"]"
     
-    def pick_action(self):
+    def action_selection(self):
         #do stuff
         #raise / call / fold
