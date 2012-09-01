@@ -23,6 +23,8 @@ class Hand:
   
   def __cmp__(self, other):
       for i in range(0, self.strength()):
+          if self.strength()[i] == other.strength()[i]:
+              continue
           return self.strength()[i] - other.strength()[i]
       
   
