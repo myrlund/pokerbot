@@ -74,8 +74,8 @@ class Game:
          
     def greatest_hand(self):
         #find the winner
-        for player in self.players:
-            winner = player.hand.strength()
+        for i in range(0, self.players-1):
+            winner = self.players[i].hand.__cmp__(self.players[i+1])
         
             
                             
