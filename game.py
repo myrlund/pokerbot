@@ -74,11 +74,10 @@ class Game:
          
     def greatest_hand(self):
         #find the winner
-        for i in range(0, self.players-1):
-            if self.players[i].hand.__cmp__(self.players[i+1]) > 0:
+        winner = self.players[0]
+        for i in range(1, self.players):
+            if winner.hand.__cmp__(self.players[i]) < 0:
                 winner = self.players[i]
-            else:
-                winner = self.players[i+1]
         return winner
             
                             
