@@ -21,10 +21,15 @@ class Player:
     def action_selection(self):
         #do stuff
         #raise / call / fold
+        
+        if self.hand.strength()[0] > 7:
+            self.raise_bet(100)
+            
     
         
     #bets an amount of money, i.e. puts it in the pot of the game
     def raise_bet(self, amount):
+        self.game.pot += amount
         
         
     #calls the amount already betted
@@ -32,5 +37,7 @@ class Player:
         
         
     def fold(self):
+        print "! Player "+self.playerid+" folds !"
+        self.game.fold_player(self)
         
     
