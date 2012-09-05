@@ -1,4 +1,5 @@
 from oocards import *
+from player import *
 import csv
 import random
 
@@ -8,6 +9,8 @@ class Dealer:
     def __init__(self):
         self.deck = []
         self.sorted_deck = []
+        self.gen_shuffled_deck()
+        self.gen_sorted_deck()
         
     def gen_sorted_deck(self):
         self.sorted_deck = []
@@ -22,7 +25,6 @@ class Dealer:
             index = random.randint(0, 51-i)
             self.deck[i] = temp_deck[index]
             temp_deck[index:index+1] = []
-        
         
        
     def gen_shuffled_deck(self):
@@ -40,6 +42,11 @@ class Dealer:
                 self.gen_sorted_deck()
         return cards
     
+    def remove_from_deck(self, card):
+        for c in self.deck:
+            if (c.__cmp__()==0 & c.suit==card.suit):
+                self.deck.remove(c)
+                
     
     #deals nr_of_cards card(s) of it's deck
     def deal(self, nr_of_cards):
@@ -51,7 +58,6 @@ class Dealer:
                 print "Deck is empty. Shuffling new..."
                 self.gen_shuffled_deck()
         return cards
-        
         
         
 class Game:
@@ -66,17 +72,48 @@ class Game:
         
     #rolls through 100k games and records probability of winning with given hole cards.
     #then writes probabilities to csv file...
+    #
     def rollout_play(self):
-        stats = [][]
+        stats = [[]]
+        self.dealer = Dealer()
+        self.players.append(Player(1, 0, self))
+        self.players.append(Player(2, 0, self))
+        self.players.append(Player(3, 0, self))
+        self.players.append(Player(4, 0, self))
         
-        for i in range(0, 100):
-            self.deal_hole_cards()
-            self.take_bets()
+        
+        
+        for i in range(2, 8):
+            for j in range(8, 15):
+                #deals combination of hole cards that are not equivalent, to player 1
+                wins = 0
+                draws = 0
+                losses = 0
+                card1 = Card("s", i)
+                card2 = Card("s", j)
+                self.players[0].deal(Hand([card1, card2]))
+                self.dealer.remove_from_deck(card1)
+                self.dealer.remove_from_deck(card2)
+                
+                #proceedes to deal to rest of players (100k times?) and registering wins,losses and draws
+                for i in range(0, 100): #100k?
+                    for i in range(1, self.players):
+                        self.players[i].deal(self.dealer.deal(2))
+
+                    self.take_bets()
+                    self.deal_rollout()
+                    self.take_bets()
+                    winners = self.find_winner()
+                    if winners.count(self.players[0]) > 0:
+                        if winners.count() == 1:
+                            win++
+                        else:
+                            draw++
+                        continue
+                    losses++
+                         
             
-            self.deal_rollout()
-            self.take_bets()    
-            
-            
+        
         stats_file = open("hole_card_stats.csv", "wb")
         stats_writer = csv.writer(stats_file, delimiter=",")
         for i in range(0, stats):
@@ -90,12 +127,17 @@ class Game:
         
          
     def find_winner(self):
-        #find the winner
-        winner = self.players[0]
+        #find the winners, returns a list with all the winners (drawz!)
+        winners = []
+        winners_counter = 1
+        winners[0] = self.players[0]
         for i in range(1, self.players):
-            if winner.hand.__cmp__(self.players[i]) < 0:
-                winner = self.players[i]
-        return winner
+            if winners[0].hand.__cmp__(self.players[i]) < 0:
+                winners[0] = self.players[i]
+            elif winners[0].hand.__cmp__(self.players[i]) == 0:
+                winners[winners_counter] = self.players[i]
+                winners_counter++
+        return winners
             
                             
     def take_bets(self):
