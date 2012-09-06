@@ -1,9 +1,10 @@
-from oocards import *
+from cards import *
 import random
 
 
 
 class Dealer:
+    
     def __init__(self):
         self.deck = []
         self.sorted_deck = []
@@ -50,8 +51,6 @@ class Dealer:
                 print "Deck is empty. Shuffling new..."
                 self.gen_shuffled_deck()
         return cards
-        
-        
         
 class Game:
     
@@ -105,6 +104,9 @@ class Game:
         print "- On table: "+ str(self.cards_on_table) +" $"+ str(self.pot) +" "
         print "In deck: "+ str(self.dealer.deck)
         
-    
 
-        
+if __name__ == '__main__':
+    dealer = Dealer()
+    dealer.gen_shuffled_deck()
+    print sorted(dealer.deck)
+
