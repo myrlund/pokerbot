@@ -1,4 +1,5 @@
 from cards import *
+import csv
 import random
 
 
@@ -62,20 +63,38 @@ class Game:
         self.dealer = dealer #hummhumm? 
         self.pot = pot
         
-        
+    #rolls through 100k games and records probability of winning with given hole cards.
+    #then writes probabilities to csv file...
     def rollout_play(self):
-        self.deal_hole_cards()
-        self.take_bets()
+        stats = [][]
         
-        self.deal_rollout()
-        self.take_bets()
+        for i in range(0, 100):
+            self.deal_hole_cards()
+            self.take_bets()
+            
+            self.deal_rollout()
+            self.take_bets()    
+            
+            
+        stats_file = open("hole_card_stats.csv", "wb")
+        stats_writer = csv.writer(stats_file, delimiter=",")
+        for i in range(0, stats):
+            for i in range(0, stats[]):
+                stats_writer.write(stats[i][j])
+                
+                
+        
+    def fold_player(self, folded_player):
+        self.players.delete(folded_player)
         
          
-    def greatest_hand(self):
+    def find_winner(self):
         #find the winner
-        for player in self.players:
-            winner = player.hand.strength()
-        
+        winner = self.players[0]
+        for i in range(1, self.players):
+            if winner.hand.__cmp__(self.players[i]) < 0:
+                winner = self.players[i]
+        return winner
             
                             
     def take_bets(self):
