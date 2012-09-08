@@ -13,6 +13,7 @@ class Player:
         self.hand = []
         self.playerpot = playerpot
         self.game = game
+        self.current_bet = 0
        
     #receives the cards dealt to the player 
     def deal(self, hand):
@@ -27,14 +28,14 @@ class Player:
             
     
         
-    #bets an amount of money, i.e. puts it in the pot of the game
+    #raises own bet
     def raise_bet(self, amount):
-        self.game.pot += amount
+        self.current_bet += amount
         
         
     #calls the amount already betted
     def call_bet(self):
-        
+        self.current_bet = game.current_bet
         
     def fold(self):
         print "! Player "+self.playerid+" folds !"

@@ -64,12 +64,17 @@ class Game:
     
     #  w00t holder vel game-staten hummhumm
 
-    def __init__(self, players, dealer):
-        self.players = players
+    def __init__(self, dealer):
+        self.players = []
         self.cards_on_table = []
         self.dealer = dealer #hummhumm? 
         self.pot = 0
+        current_bet = 0
         
+    def add_player(self, player):
+        self.players.append(player)
+        
+    
     #rolls through 100k games and records probability of winning with given hole cards.
     #then writes probabilities to csv file...
     #
@@ -105,9 +110,8 @@ class Game:
                     for y in range(1, self.players):
                         self.players[y].deal(self.dealer.deal(2))
 
-                    self.take_bets()
                     self.deal_rollout()
-                    self.take_bets()
+                    
                     winners = self.find_winner()
                     if winners.count(self.players[0]) > 0:
                         if winners.count()==1:
@@ -174,9 +178,18 @@ class Game:
                 winners_counter+=1
         return winners
             
-                            
+    #get actions from all the players, call/raise/fold                        
     def take_bets(self):
-        return 
+#        something = true
+#        while(something):
+#            for player in self.players:
+#                player.action_selection()
+#            for player in self.players:
+#                if player.current_bet=self.current_bet:
+#                    something=false
+#        
+#        for player in self.players:
+            
     
     def deal_flop(self):
         self.cards_on_table += self.dealer.deal_n_cards(3)
