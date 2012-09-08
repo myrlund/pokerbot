@@ -64,17 +64,17 @@ class Game:
     
     #  w00t holder vel game-staten hummhumm
 
-    def __init__(self, players, cards_on_table, dealer, pot):
+    def __init__(self, players, dealer):
         self.players = players
-        self.cards_on_table = cards_on_table
+        self.cards_on_table = []
         self.dealer = dealer #hummhumm? 
-        self.pot = pot
+        self.pot = 0
         
     #rolls through 100k games and records probability of winning with given hole cards.
     #then writes probabilities to csv file...
     #
     def rollout_play(self):
-        stats = [[]]
+        
         self.dealer = Dealer()
         self.players.append(Player(1, 0, self))
         self.players.append(Player(2, 0, self))
@@ -83,44 +83,79 @@ class Game:
         
         
         
-        for i in range(2, 8):
-            for j in range(8, 15):
-                #deals combination of hole cards that are not equivalent, to player 1
+        stats = []
+        for i in range(2, 15):
+            row_of_stats = []
+            for j in range(2, 15):
+                if j<i:
+                    continue
+                #deals combination of hole cards that are not equivalent, to player 1,
                 wins = 0
                 draws = 0
                 losses = 0
                 card1 = Card("s", i)
                 card2 = Card("s", j)
                 self.players[0].deal(Hand([card1, card2]))
+                #removes the cards it dealt from the deck
                 self.dealer.remove_from_deck(card1)
                 self.dealer.remove_from_deck(card2)
                 
                 #proceedes to deal to rest of players (100k times?) and registering wins,losses and draws
-                for i in range(0, 100): #100k?
-                    for i in range(1, self.players):
-                        self.players[i].deal(self.dealer.deal(2))
+                for x in range(0, 100): #100k?
+                    for y in range(1, self.players):
+                        self.players[y].deal(self.dealer.deal(2))
 
                     self.take_bets()
                     self.deal_rollout()
                     self.take_bets()
                     winners = self.find_winner()
                     if winners.count(self.players[0]) > 0:
-                        if winners.count() == 1:
-                            win++
+                        if winners.count()==1:
+                            wins+=1
+                            
                         else:
-                            draw++
+                            draws+=1
                         continue
-                    losses++
-                         
-            
-        
+                    losses+=1
+                #save statistics of the given hole card combination
+                row_of_stats.append(wins/(wins+draws+losses))
+            stats.append(row_of_stats)
+                
+        #save the statistics to a csv file
         stats_file = open("hole_card_stats.csv", "wb")
         stats_writer = csv.writer(stats_file, delimiter=",")
         for i in range(0, stats):
-            for i in range(0, stats[]):
+            for j in range(0, stats):
                 stats_writer.write(stats[i][j])
                 
-                
+    #standard play  
+    def play(self):
+        self.deal_hole_cards()
+        self.print_gamestate()
+        
+        self.take_bets()
+        self.print_gamestate()
+        
+        self.deal_flop()
+        self.print_gamestate()
+        
+        self.take_bets()
+        self.print_gamestate()
+        
+        self.deal_turn()
+        self.print_gamestate()
+        
+        self.take_bets()
+        self.print_gamestate()
+        
+        self.deal_river()
+        self.print_gamestate()
+        
+        self.take_bets()
+        self.print_gamestate()
+        
+        print "WINNER: "+self.find_winner()
+            
         
     def fold_player(self, folded_player):
         self.players.delete(folded_player)
@@ -136,7 +171,7 @@ class Game:
                 winners[0] = self.players[i]
             elif winners[0].hand.__cmp__(self.players[i]) == 0:
                 winners[winners_counter] = self.players[i]
-                winners_counter++
+                winners_counter+=1
         return winners
             
                             
