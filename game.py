@@ -69,7 +69,7 @@ class Game:
         self.cards_on_table = []
         self.dealer = dealer #hummhumm? 
         self.pot = 0
-        current_bet = 0
+        high_bet = 0
         
     def add_player(self, player):
         self.players.append(player)
@@ -133,7 +133,7 @@ class Game:
                 stats_writer.write(stats[i][j])
                 
     #standard play  
-    def play(self):
+    def play_round(self):
         self.deal_hole_cards()
         self.print_gamestate()
         
@@ -158,7 +158,10 @@ class Game:
         self.take_bets()
         self.print_gamestate()
         
-        print "WINNER: "+self.find_winner()
+        winner = self.find_winner()
+        print "WINNER: "+winner
+        winner.get_winnings(self.pot)
+        
             
         
     def fold_player(self, folded_player):
@@ -180,15 +183,27 @@ class Game:
             
     #get actions from all the players, call/raise/fold                        
     def take_bets(self):
-#        something = true
-#        while(something):
-#            for player in self.players:
-#                player.action_selection()
-#            for player in self.players:
-#                if player.current_bet=self.current_bet:
-#                    something=false
-#        
-#        for player in self.players:
+        better = None 
+        player = self.players[0]
+        i = 0
+        
+        while(not better==player):
+            bet = player.action_selection(self.high_bet)
+            if bet>0:
+                better = player
+                self.high_bet = player.current_bet
+                self.pot += bet
+            elif bet < 0:
+                self.fold_player(player)
+                
+            if i < self.players-1:
+                i += 1
+            else:
+                i = 0
+            player = self.players[i]
+        
+        
+        
             
     
     def deal_flop(self):
