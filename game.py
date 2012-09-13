@@ -113,7 +113,7 @@ class Game:
                     
                     winners = self.find_winner()
                     if winners.count(self.players[0]) > 0:
-                        if len(winners) == 1:
+                        if len(winners) == 1: 
                             wins+=1
                             
                         else:
