@@ -22,7 +22,7 @@ class Hand:
         self.cards = Hand.calculate_max_hand(hole_cards + cards_on_table)
     
     @classmethod
-    def calculate_max_hand(cards):
+    def calculate_max_hand(self, cards):
         if len(cards) > 5:
             # TODO: Choose best permutation
             cards = cards[0:5]

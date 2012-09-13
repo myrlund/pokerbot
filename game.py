@@ -46,7 +46,7 @@ class Dealer:
     
     def remove_from_deck(self, card):
         for c in self.deck:
-            if (c.__cmp__()==0 & c.suit==card.suit):
+            if c == card:
                 self.deck.remove(c)
                 
     
@@ -73,8 +73,8 @@ class Game:
         high_bet = 0
         
     def add_player(self, player):
+        player.game = self
         self.players.append(player)
-        
     
     #rolls through 100k games and records probability of winning with given hole cards.
     #then writes probabilities to csv file...
@@ -82,12 +82,10 @@ class Game:
     def rollout_play(self):
         
         self.dealer = Dealer()
-        self.players.append(Player(1, 0, self))
-        self.players.append(Player(2, 0, self))
-        self.players.append(Player(3, 0, self))
-        self.players.append(Player(4, 0, self))
-        
-        
+        self.add_player(Player(1, 0))
+        self.add_player(Player(2, 0))
+        self.add_player(Player(3, 0))
+        self.add_player(Player(4, 0))
         
         stats = []
         for i in range(2, 15):
@@ -108,14 +106,14 @@ class Game:
                 
                 #proceedes to deal to rest of players (100k times?) and registering wins,losses and draws
                 for x in range(0, 10): #100k?
-                    for y in range(1, self.players):
-                        self.players[y].deal(self.dealer.deal(2))
+                    for y in range(1, len(self.players)):
+                        self.players[y].deal(Hand(self.dealer.deal(2)))
 
                     self.deal_rollout()
                     
                     winners = self.find_winner()
                     if winners.count(self.players[0]) > 0:
-                        if winners.count()==1:
+                        if len(winners) == 1:
                             wins+=1
                             
                         else:
@@ -174,13 +172,13 @@ class Game:
         #find the winners, returns a list with all the winners (drawz!)
         winners = []
         winners_counter = 1
-        winners[0] = self.players[0]
-        for i in range(1, self.players):
-            if winners[0].hand.__cmp__(self.players[i]) < 0:
-                winners[0] = self.players[i]
-            elif winners[0].hand.__cmp__(self.players[i]) == 0:
-                winners[winners_counter] = self.players[i]
-                winners_counter+=1
+        winners.append(self.players[0])
+        for i in range(1, len(self.players)):
+            if winners[0].hand < self.players[i].hand:
+                winners = [self.players[i]]
+            elif winners[0].hand == self.players[i].hand:
+                winners.append(self.players[i])
+                winners_counter += 1
         return winners
             
     #get actions from all the players, call/raise/fold                        
@@ -203,48 +201,39 @@ class Game:
             else:
                 i = 0
             player = self.players[i]
-        
-        
-        
-    
     
     def deal_flop(self):
-        self.cards_on_table += self.dealer.deal_n_cards(3)
+        self.cards_on_table += self.dealer.deal(3)
         
     def deal_turn(self):
-        self.cards_on_table += self.dealer.deal_n_cards(1)
+        self.cards_on_table += self.dealer.deal(1)
         
     def deal_river(self):
-        self.cards_on_table += self.dealer.deal_n_cards(1)
+        self.cards_on_table += self.dealer.deal(1)
         
     def deal_rollout(self):
-        self.cards_on_table = self.dealer.deal_n_cards(5)
+        self.cards_on_table = self.dealer.deal(5)
         
     def deal_hole_cards(self):
         for player in self.players:
-            player.deal(Hand(self, self.dealer.deal_n_cards(2)))
-        
-        
+            player.deal(Hand(self, self.dealer.deal(2)))
+
     def print_gamestate(self):
         for player in self.players:
             print(player)
         print "- On table: "+ str(self.cards_on_table) +" $"+ str(self.pot) +" "
         print "In deck: "+ str(self.dealer.deck)
-        
 
-        
+
+
 if __name__ == "__main__":
-        print "WE BE TESTIN UP IN HERRE!"
-        dealer = Dealer()
-        
-        game = Game(dealer)
-        player1 = Player(1, 20, game)
-        player2 = Player(2, 20, game)
-        player3 = Player(3, 20, game)
-        player4 = Player(4, 20, game)
-        game.add_player(player1)
-        game.add_player(player2)
-        game.add_player(player3)
-        game.add_player(player4)
-        game.rollout_play()
-        
+    print "WE BE TESTIN UP IN HERRE!"
+    dealer = Dealer()
+    
+    game = Game(dealer)
+    game.add_player(Player(1, 20))
+    game.add_player(Player(2, 20))
+    game.add_player(Player(3, 20))
+    game.add_player(Player(4, 20))
+    game.rollout_play()
+    

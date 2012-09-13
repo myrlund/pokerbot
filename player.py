@@ -1,3 +1,4 @@
+from oocards import Hand
 class Player:
     #maybe we should distinguish between "intelligent" player and "unintelligent" bots?
     
@@ -5,14 +6,11 @@ class Player:
     #a Hand is the best hand, no distinction?
     def __str__(self):
         return "[Player: "+ self.playerid +" Pot: $"+ str(self.playerpot) +" Cards: "+ str(self.hand) +"]"
-    
-    
 
-    def __init__(self, playerid, playerpot, game):
+    def __init__(self, playerid, playerpot):
         self.playerid = playerid #unique ID number, needed for opponent evaluation?
-        self.hand = []
+        self.hand = Hand()
         self.playerpot = playerpot
-        self.game = game
         self.current_bet = 0
        
     #receives the cards dealt to the player 
