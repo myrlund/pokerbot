@@ -60,7 +60,7 @@ class Dealer:
                 print "Deck is empty. Shuffling new..."
                 self.gen_shuffled_deck()
         return cards
-        
+
 class Game:
     
     #  w00t holder vel game-staten hummhumm
@@ -113,9 +113,8 @@ class Game:
                     
                     winners = self.find_winner()
                     if winners.count(self.players[0]) > 0:
-                        if len(winners) == 1: 
+                        if len(winners) == 1:
                             wins+=1
-                            
                         else:
                             draws+=1
                         continue
@@ -187,7 +186,7 @@ class Game:
         player = self.players[0]
         i = 0
         
-        while(not better==player):
+        while better != player:
             bet = player.action_selection(self.high_bet)
             if bet>0:
                 better = player
