@@ -23,7 +23,7 @@ class Dealer:
         self.deck = []
         for i in range(0, 52):
             index = random.randint(0, 51-i)
-            self.deck[i] = temp_deck[index]
+            self.deck.append(temp_deck[index])
             temp_deck[index:index+1] = []
         
        
@@ -38,7 +38,7 @@ class Dealer:
             if self.sorted_deck:
                 cards.append(self.sorted_deck.pop(0))
             else:
-                print "Sorted deck is empty. Making new..."
+                print 'Sorted deck is empty. Making new.'
                 self.gen_sorted_deck()
         return cards
     
@@ -100,13 +100,13 @@ class Game:
                 losses = 0
                 card1 = Card("s", i)
                 card2 = Card("s", j)
-                self.players[0].deal(Hand([card1, card2]))
+                self.players[0].deal(Hand([card1, card2], []))
                 #removes the cards it dealt from the deck
                 self.dealer.remove_from_deck(card1)
                 self.dealer.remove_from_deck(card2)
                 
                 #proceedes to deal to rest of players (100k times?) and registering wins,losses and draws
-                for x in range(0, 100): #100k?
+                for x in range(0, 10): #100k?
                     for y in range(1, self.players):
                         self.players[y].deal(self.dealer.deal(2))
 
@@ -124,13 +124,14 @@ class Game:
                 #save statistics of the given hole card combination
                 row_of_stats.append(wins/(wins+draws+losses))
             stats.append(row_of_stats)
+            print str(row_of_stats)
                 
         #save the statistics to a csv file
-        stats_file = open("hole_card_stats.csv", "wb")
-        stats_writer = csv.writer(stats_file, delimiter=",")
-        for i in range(0, stats):
-            for j in range(0, stats):
-                stats_writer.write(stats[i][j])
+#        stats_file = open("hole_card_stats.csv", "wb")
+#        stats_writer = csv.writer(stats_file, delimiter=",")
+#        for i in range(0, stats):
+#            for j in range(0, stats):
+#                stats_writer.write(stats[i][j])
                 
     #standard play  
     def play_round(self):
@@ -204,7 +205,7 @@ class Game:
         
         
         
-            
+    
     
     def deal_flop(self):
         self.cards_on_table += self.dealer.deal_n_cards(3)
@@ -225,10 +226,25 @@ class Game:
         
     def print_gamestate(self):
         for player in self.players:
-            print str(player)
+            print(player)
         print "- On table: "+ str(self.cards_on_table) +" $"+ str(self.pot) +" "
         print "In deck: "+ str(self.dealer.deck)
         
     
 
+        
+if __name__ == "__main__":
+        print "WE BE TESTIN UP IN HERRE!"
+        dealer = Dealer()
+        
+        game = Game(dealer)
+        player1 = Player(1, 20, game)
+        player2 = Player(2, 20, game)
+        player3 = Player(3, 20, game)
+        player4 = Player(4, 20, game)
+        game.add_player(player1)
+        game.add_player(player2)
+        game.add_player(player3)
+        game.add_player(player4)
+        game.rollout_play()
         

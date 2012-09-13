@@ -38,7 +38,7 @@ class Hand:
 
   def strength(self):
     """Returns strength of hand, on a scale from [1] to [9]."""
-    return [5]
+    return []
     
   @classmethod
   def strength_type(self, cards):
