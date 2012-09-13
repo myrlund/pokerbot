@@ -13,28 +13,31 @@ class Player:
         self.hand = []
         self.playerpot = playerpot
         self.game = game
+        self.current_bet = 0
        
     #receives the cards dealt to the player 
     def deal(self, hand):
         self.hand = hand
         
-    def action_selection(self):
-        #do stuff
+    def action_selection(self, high_bet):
+        #do stuff, returns returns amount of betting money, negative if fold    
         #raise / call / fold
         
-        if self.hand.strength()[0] > 7:
-            self.raise_bet(100)
+        return 100
             
+            
+    def get_winnings(self, winnings):
+        self.playerpot += winnings
     
         
-    #bets an amount of money, i.e. puts it in the pot of the game
+    #raises own bet
     def raise_bet(self, amount):
-        self.game.pot += amount
+        self.current_bet += amount
         
         
     #calls the amount already betted
     def call_bet(self):
-        
+        self.current_bet = self.game.current_bet
         
     def fold(self):
         print "! Player "+self.playerid+" folds !"
