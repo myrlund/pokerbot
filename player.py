@@ -18,10 +18,10 @@ class Player:
         self.hand = hand
         
     def action_selection(self, high_bet):
-        #do stuff, returns returns amount of betting money, negative if fold    
-        #raise / call / fold
-        
-        return 100
+        if (self.hand.strength()[0] > 5) and (len(self.hand)==3):
+            return 100
+        else:
+            self.fold()
             
             
     def get_winnings(self, winnings):
