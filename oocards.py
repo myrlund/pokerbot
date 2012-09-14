@@ -1,6 +1,35 @@
 from strengths import *
 from copy import copy
+from _cards import calc_cards_power
 import random
+
+# def calculate_max_hand(cards):
+#     # a b c d e f g
+#     if len(cards) > 5:
+#         for i in range(len(cards) - 1):
+#             
+#         
+#         # TODO: Choose best permutation
+#         cards = cards[0:5]
+#     
+#     return sorted(cards)
+
+def strength_of_cards(cards):
+    """Returns strength of hand, on a scale from [1] to [9]."""
+    bullshit_cards = [[card.value, card.suit] for card in cards]
+    return calc_cards_power(bullshit_cards)
+    # for strength_type in range(9, 1, -1):
+    #     strength_found = STRENGTH_TYPE_INDICATORS[strength_type](cards)
+    #     if strength_found:
+    #         return strength_found
+    # return [1] + sorted(cards).reverse()
+    
+def strength_type(cards):
+    for strength_type in range(9, 1, -1):
+        if STRENGTH_TYPE_INDICATORS[strength_type](cards):
+            return strength_type
+    return 1
+
 
 class Deck:
     
@@ -26,6 +55,11 @@ class Deck:
         for i in range(n):
             cards.append(self.cards.pop())
         return cards
+    
+    def remove(self, cards):
+        for c in self.cards:
+            if c in cards:
+                self.cards.remove(c)
 
 class Card:
     
@@ -46,7 +80,7 @@ class Hand:
   
     def __init__(self, hole_cards=[0], cards_on_table=[]):
         self.hole_cards = hole_cards
-        self.cards = Hand.calculate_max_hand(hole_cards + cards_on_table)
+        self.cards_on_table = cards_on_table
 
     def __cmp__(self, other):
         for i in range(0, len(self.strength())):
@@ -56,37 +90,10 @@ class Hand:
         return 0
 
     def strength(self):
-        return Hand.strength_of_cards(self.cards)
+        return strength_of_cards(self.hole_cards + self.cards_on_table)
 
-    @classmethod
-    def calculate_max_hand(self, cards):
-        # a b c d e f g
-        if len(cards) > 5:
-            # for i in range(len(cards) - 1):
-            
-            # TODO: Choose best permutation
-            cards = cards[0:5]
-        
-        return sorted(cards)
-
-    @classmethod
-    def strength_of_cards(self, cards):
-        """Returns strength of hand, on a scale from [1] to [9]."""
-        for strength_type in range(9, 1, -1):
-            strength_found = STRENGTH_TYPE_INDICATORS[strength_type](cards)
-            if strength_found:
-                return strength_found
-        return [1] + sorted(cards).reverse()
-        
-    @classmethod
-    def strength_type(self, cards):
-        for strength_type in range(9, 1, -1):
-            if STRENGTH_TYPE_INDICATORS[strength_type](cards):
-                return strength_type
-        return 1
-    
     def __str__(self):
-        return str(Hand.calculate_max_hand(self.cards))
+        return str(self.strength())
         
 STRENGTH_TYPES = {
     1: 'high card',

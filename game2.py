@@ -21,10 +21,18 @@ class Game:
         self.blinds = (1, 2)
         self.max_raises = 3
     
-    def play(self, n=10):
+    def play(self, n=100):
         """Plays n rounds."""
-        for i in range(1, n):
+        for i in range(n):
             self.play_round()
+        
+        print "Scores:"
+        total = 0
+        for player in self.players:
+            print "%s: %d" % (player, player.balance)
+            total += player.balance
+        
+        print "TOTAL: %d" % total
     
     def play_round(self):
         self.deck = Deck()
@@ -163,7 +171,10 @@ class Round:
             player = self.players[player_index]
             player_hand = Hand(self.hands[player], self.table)
             
-            print "* %s shows %s." % (player, player_hand)
+            if not strongest_hand:
+                strongest_hand = player_hand
+            
+            self.debug("* %s shows %s." % (player, player_hand.hole_cards))
             
             # Assume first player is the strongest
             if not strongest_players:
@@ -181,7 +192,7 @@ class Round:
         # Share pot money between winners
         pot_per_player = self.pot / len(strongest_players)
         for player in strongest_players:
-            print "** %s wins %d." % (player, pot_per_player)
+            self.debug("** %s wins %d with a %s." % (player, pot_per_player, STRENGTH_TYPES[strongest_hand.strength()[0]]))
             player.win(pot_per_player)
         
         return strongest_players
@@ -229,9 +240,49 @@ class Round:
         else:
             self.total_bets[player] = amount
     
-    def update(self, msg):
-        print "%s Pot total: %d." % (msg, self.pot)
+    def debug(self, msg):
+        print msg
     
+    def update(self, msg):
+        self.debug("%s Pot total: %d." % (msg, self.pot))
+
+
+class RolloutGame(Game):
+    def play(self, hand, n=100):
+        n_wins = 0
+        n_draws = 0
+        for i in range(n):
+            winners = self.play_round(hand)
+            if self.players[0] in winners: 
+                if len(winners) == 1:
+                    n_wins += 1
+                else:
+                    n_draws += 1
+        return (n_wins + n_draws / 2.0) / n
+    
+    def play_round(self, cards):
+        self.deck = Deck()
+        return RolloutRound(self, self.dealer_position).play(cards)
+
+class RolloutRound(Round):
+    def play(self, hand):
+        self.hand = hand
+        return Round.play(self)
+    
+    def deal_hole_cards(self):
+        self.hands[self.players[0]] = self.hand
+        self.game.deck.remove(self.hand)
+        for player in self.players[1:]:
+            self.hands[player] = self.game.deal(2)
+        
+    def take_bets(self, place_blinds=False):
+        """A simple overridden take_bets, without money and shit."""
+        return 0
+
+    def debug(self, msg):
+        pass
+
+
 class APlayer:
     """Abstract player class."""
     
@@ -261,8 +312,20 @@ class Player(APlayer):
 if __name__ == '__main__':
     player1 = Player("Player 1", 1000)
     player2 = Player("Player 2", 1000)
-    game = Game([player1, player2])
-    game.play()
+    player3 = Player("Player 3", 1000)
+    player4 = Player("Player 4", 1000)
+    game = RolloutGame([player1, player2, player3, player4])
+    
+    for v1 in VALUES.keys():
+        for v2 in [v for v in VALUES.keys() if v < v1]:
+            if v1 != v2:
+                hand = [Card(SUITS.keys()[0], v1), Card(SUITS.keys()[0], v2)]
+                print "%s: %f" % (hand, game.play(hand))
+            hand = [Card(SUITS.keys()[0], v1), Card(SUITS.keys()[1], v2)]
+            print "%s: %f" % (hand, game.play(hand))
+            
+        
+            
 
 
 
