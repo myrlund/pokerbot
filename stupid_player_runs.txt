@@ -1,0 +1,36 @@
+Each player starts with 1000.
+
+RUN 1:
+stupid1: 2430
+stupid2: 220
+stupid3: -690
+stupid4: 2300
+stupid5: 740
+
+RUN 2:
+stupid1: 4120
+stupid2: 1000
+stupid3: 1000
+stupid4: -430
+stupid5: -690
+
+RUN 3:
+stupid1: 1390
+stupid2: 870
+stupid3: 2560
+stupid4: 610
+stupid5: -430
+
+RUN 4:
+stupid1: -560
+stupid2: -1340
+stupid3: 2430
+stupid4: 1130
+stupid5: 3340
+
+RUN 5:
+stupid1: -1080
+stupid2: 3210
+stupid3: 3730
+stupid4: 220
+stupid5: -1080
