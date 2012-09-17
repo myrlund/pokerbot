@@ -1,5 +1,7 @@
 from copy import copy
 from oocards import *
+import sys
+import pickle
 
 # Some information constants
 HIGH_BET   = 0
@@ -248,7 +250,7 @@ class Round:
 
 
 class RolloutGame(Game):
-    def play(self, hand, n=100):
+    def play(self, hand, n=10):
         n_wins = 0
         n_draws = 0
         for i in range(n):
@@ -309,23 +311,76 @@ class Player(APlayer):
     def act(self, round, info):
         return RAISE, round.game.blinds[1]
 
-if __name__ == '__main__':
-    player1 = Player("Player 1", 1000)
-    player2 = Player("Player 2", 1000)
-    player3 = Player("Player 3", 1000)
-    player4 = Player("Player 4", 1000)
-    game = RolloutGame([player1, player2, player3, player4])
-    
-    for v1 in VALUES.keys():
-        for v2 in [v for v in VALUES.keys() if v < v1]:
-            if v1 != v2:
-                hand = [Card(SUITS.keys()[0], v1), Card(SUITS.keys()[0], v2)]
-                print "%s: %f" % (hand, game.play(hand))
-            hand = [Card(SUITS.keys()[0], v1), Card(SUITS.keys()[1], v2)]
-            print "%s: %f" % (hand, game.play(hand))
-            
+def equivalent_hand(card1, card2):
+    # Paired hole cards
+    if card1.value == card2.value:
+        return [Card(SUITS.keys()[0], card1.value), Card(SUITS.keys()[1], card2.value)]
+    else:
+        # Put highest card first
+        if card1.value < card2.value:
+            card1, card2 = card2, card1
         
-            
+        # Suited?
+        if card1.suit == card2.suit:
+            return [Card(SUITS.keys()[0], card1.value), Card(SUITS.keys()[0], card2.value)]
+        else:
+            return [Card(SUITS.keys()[0], card1.value), Card(SUITS.keys()[1], card2.value)]
+
+def hand_hash(cards):
+    return ",".join([str(c) for c in cards])
+
+def random_card():
+    value_key_index = random.randint(0, len(VALUES.keys()) - 1)
+    value = VALUES.keys()[value_key_index]
+    suit = SUITS.keys()[random.randint(0, len(SUITS.keys()) - 1)]
+    return Card(suit, value)
+
+PROBABILITIES_FILE = "stats-%d-players-%d-accuracy.data"
+
+def winning_probability(hand):
+    picklefile = open(PROBABILITIES_FILE, 'r')
+    probabilities = pickle.load(picklefile)
+    picklefile.close()
+    
+    equivalent_hand = equivalent_hand(*hand)
+    hand_hash = hand_hash(equivalent_hand)
+    return probabilities[hand_hash]
+
+if __name__ == '__main__':
+    N = 10000
+    for n_players in range(2, 9):
+        players = [Player("Player %d" % i, 0) for i in range(1, n_players + 1)]
+        game = RolloutGame(players)
+        
+        probabilities = {}
+        for v1 in VALUES.keys():
+            for v2 in [v for v in VALUES.keys() if v <= v1]:
+                if v1 != v2:
+                    hand = [Card(SUITS.keys()[0], v1), Card(SUITS.keys()[0], v2)]
+                    probabilities[hand_hash(hand)] = game.play(hand, N)
+                    # print '.'
+                    print "%s: %f" % (hand, probabilities[hand_hash(hand)])
+                hand = [Card(SUITS.keys()[0], v1), Card(SUITS.keys()[1], v2)]
+                probabilities[hand_hash(hand)] = game.play(hand, N)
+                # print '.'
+                print "%s: %f" % (hand, probabilities[hand_hash(hand)])
+        
+        picklefile = open(PROBABILITIES_FILE % (n_players, N), 'w')
+        pickle.dump(probabilities, picklefile)
+        picklefile.close()
+        
+        print ""
+        print "Wrote to %s." % (PROBABILITIES_FILE % (n_players, N))
+    
+#    picklefile = open(PROBABILITIES_FILE, 'r')
+#    probabilities = pickle.load(picklefile)
+#    picklefile.close()
+#    
+#    # Pick 1000 random cards and find their probabilities
+#    for i in range(1000):
+#        hand = [random_card(), random_card()]
+#        print hand
+#        print "Probability of winning with %s: %f" % (hand, probabilities[hand_hash(equivalent_hand(*hand))])
 
 
 
